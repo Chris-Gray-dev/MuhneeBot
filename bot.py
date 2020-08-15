@@ -17,6 +17,19 @@ def __in_voice_channel(voice):
     ids = [vc.id for vc in [vc.channel for vc in DISCORD_CLIENT.voice_clients]]
     return voice.channel.id in ids
 
+async def __play_sound(voiceChannel):
+    global DISCORD_CLIENT
+    global AUDIO_FILES
+    path = "audio\\"
+    file = os.path.join(path,random.choice(AUDIO_FILES))
+    if voiceChannel is not None and not __in_voice_channel(voiceChannel):
+        vc = await voiceChannel.channel.connect()
+        vc.play(discord.FFmpegPCMAudio(file), after=lambda e: print('done', e))
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        vc.stop()
+        await vc.disconnect()
+        
 @DISCORD_CLIENT.event
 async def on_ready():
     global DISCORD_CLIENT
@@ -30,19 +43,13 @@ async def on_ready():
 
 @DISCORD_CLIENT.event
 async def on_message(message):
-    global DISCORD_CLIENT
-    global AUDIO_FILES
-    path = "audio\\"
-    file = os.path.join(path,random.choice(AUDIO_FILES))
     if "🐒" in message.content.lower():
-        voiceChannel = message.author.voice
-        if voiceChannel is not None and not __in_voice_channel(voiceChannel):
-            vc = await voiceChannel.channel.connect()
-            vc.play(discord.FFmpegPCMAudio(file), after=lambda e: print('done', e))
-            while vc.is_playing():
-                await asyncio.sleep(1)
-            vc.stop()
-            await vc.disconnect()
+        await __play_sound(message.author.voice)
+        
+@DISCORD_CLIENT.event
+async def on_reaction_add(reaction, user):
+    if reaction.emoji == "🐒":
+        await __play_sound(user.voice)
 
 def Run():
     global DISCORD_TOKEN

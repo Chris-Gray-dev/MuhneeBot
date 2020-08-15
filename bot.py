@@ -4,11 +4,13 @@ import os
 import asyncio
 from dotenv import load_dotenv
 import time
+import random
 
 #GLOBALS
 load_dotenv()
 DISCORD_TOKEN  = os.getenv("DISCORD_TOKEN")
 DISCORD_CLIENT = discord.Client()
+AUDIO_FILES    = os.listdir(path=".\\audio")
 
 @DISCORD_CLIENT.event
 async def on_ready():
@@ -24,7 +26,9 @@ async def on_ready():
 @DISCORD_CLIENT.event
 async def on_message(message):
     global DISCORD_CLIENT
-    file = 'snd_01.mp3'
+    global AUDIO_FILES
+    path = "audio\\"
+    file = os.path.join(path,random.choice(AUDIO_FILES))
     if "🐒" in message.content.lower():
         voiceChannel = message.author.voice
         if voiceChannel is not None:
@@ -38,6 +42,7 @@ async def on_message(message):
 def Run():
     global DISCORD_TOKEN
     global DISCORD_CLIENT
+    
     print("Running Bot...")
     DISCORD_CLIENT.run(DISCORD_TOKEN)
 

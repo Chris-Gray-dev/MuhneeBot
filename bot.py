@@ -12,6 +12,11 @@ DISCORD_TOKEN  = os.getenv("DISCORD_TOKEN")
 DISCORD_CLIENT = discord.Client()
 AUDIO_FILES    = os.listdir(path=".\\audio")
 
+def __in_voice_channel(voice):
+    global DISCORD_CLIENT
+    ids = [vc.id for vc in [vc.channel for vc in DISCORD_CLIENT.voice_clients]]
+    return voice.channel.id in ids
+
 @DISCORD_CLIENT.event
 async def on_ready():
     global DISCORD_CLIENT
@@ -31,7 +36,7 @@ async def on_message(message):
     file = os.path.join(path,random.choice(AUDIO_FILES))
     if "🐒" in message.content.lower():
         voiceChannel = message.author.voice
-        if voiceChannel is not None:
+        if voiceChannel is not None and not __in_voice_channel(voiceChannel):
             vc = await voiceChannel.channel.connect()
             vc.play(discord.FFmpegPCMAudio(file), after=lambda e: print('done', e))
             while vc.is_playing():

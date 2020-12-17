@@ -2,12 +2,12 @@
 import discord
 import os
 import asyncio
-from dotenv import load_dotenv
+from dotenv import load_dotenv,find_dotenv
 import time
 import random
 
 #GLOBALS
-load_dotenv()
+load_dotenv(find_dotenv())
 DISCORD_TOKEN  = os.getenv("DISCORD_TOKEN")
 DISCORD_CLIENT = discord.Client()
 AUDIO_FILES    = os.listdir(path=".\\audio")
